@@ -1,6 +1,10 @@
 import random
 import tkinter as tk
 
+global tiles
+global logical_board
+
+
 def validate_dimensions(height, width, mines):
     if not height.isdigit() or not width.isdigit() or not mines.isdigit():
         return False
@@ -10,6 +14,7 @@ def validate_dimensions(height, width, mines):
 
     return False
 
+
 def play_button_click(board_height, board_width, board_mines, status_label):
     if validate_dimensions(board_height, board_width, board_mines):
         start_game(int(board_height), int(board_width), int(board_mines))
@@ -17,15 +22,18 @@ def play_button_click(board_height, board_width, board_mines, status_label):
         status_label.config(text="Invalid dimensions!", fg="red")
         return
 
+
 def start_game(width, height, mines):
+    global logical_board
+    global tiles
     board = tk.Toplevel(main_window)
     board.title("Game of Minesweeper")
+
     logical_board = prepare_logical_board(width, height, mines)
     tiles = prepare_tiles(width, height, board)
-    for row in logical_board:
-        print(row)
 
     board.mainloop()
+
 
 def prepare_logical_board(width, height, mines):
     logical_board = []
@@ -72,12 +80,20 @@ def prepare_tiles(width, height, board):
         tiles_array.append(tmp_array)
     return tiles_array
 
+
 def right_click_on_tile(event):
     print(event.widget.grid_info())
+
 
 def left_click_on_tile(event):
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
+
+    if logical_board[x][y] == -1:
+        tiles[x][y].config(bg="red")
+    else:
+        tiles[x][y].config(text=str(logical_board[x][y]))
+
 
 def main():
     title_label = tk.Label(main_window, text="Minesweeper", font=("Bauhaus 93", 30))
@@ -103,6 +119,7 @@ def main():
     play_button.grid(row=8, column=1, padx=20, pady=20)
 
     main_window.mainloop()
+
 
 if __name__ == '__main__':
     main_window = tk.Tk()
