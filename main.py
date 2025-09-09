@@ -1,8 +1,8 @@
 import random
 import tkinter as tk
 
-global tiles
-global logical_board
+global main_board
+global board_dimensions
 
 
 def validate_dimensions(height, width, mines):
@@ -24,13 +24,18 @@ def play_button_click(board_height, board_width, board_mines, status_label):
 
 
 def start_game(width, height, mines):
-    global logical_board
-    global tiles
+    global main_board
+    global board_dimensions
     board = tk.Toplevel(main_window)
     board.title("Game of Minesweeper")
 
-    logical_board = prepare_logical_board(width, height, mines)
+    main_board = prepare_logical_board(width, height, mines)
     tiles = prepare_tiles(width, height, board)
+    board_dimensions = [width, height]
+
+    for x in range(len(main_board)):
+        for y in range(len(main_board[x])):
+            main_board[x][y]["tile"] = tiles[x][y]
 
     board.mainloop()
 
@@ -40,7 +45,7 @@ def prepare_logical_board(width, height, mines):
     for i in range(width):
         tmp_board = []
         for j in range(height):
-            tmp_board.append(0)
+            tmp_board.append({"state": 0, "tile": tk.Label()})
         logical_board.append(tmp_board)
 
     mine_indexes = []
@@ -48,8 +53,8 @@ def prepare_logical_board(width, height, mines):
         while True:
             x = random.randint(0, width - 1)
             y = random.randint(0, height - 1)
-            if logical_board[x][y] == 0:
-                logical_board[x][y] = -1
+            if logical_board[x][y]["state"] == 0:
+                logical_board[x][y]["state"] = -1
                 mine_indexes.append([x, y])
                 break
 
@@ -60,8 +65,8 @@ def prepare_logical_board(width, height, mines):
             if 0 <= x + k < width:
                 for j in range(-1, 2):
                     if 0 <= y + j < height:
-                        if logical_board[x + k][y + j] != -1:
-                            logical_board[x + k][y + j] += 1
+                        if logical_board[x + k][y + j]["state"] != -1:
+                            logical_board[x + k][y + j]["state"] += 1
 
     return logical_board
 
@@ -89,11 +94,22 @@ def left_click_on_tile(event):
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
-    if logical_board[x][y] == -1:
-        tiles[x][y].config(bg="red")
-    else:
-        tiles[x][y].config(text=str(logical_board[x][y]))
+    uncover_tile(x, y)
 
+
+def uncover_tile(x, y):
+    if main_board[x][y]["state"] == -1:
+        main_board[x][y]["tile"].config(bg="red")
+    elif main_board[x][y]["state"] == 0:
+        main_board[x][y]["tile"].config(bg="white", relief="flat", text="0", fg="white")
+        for k in range(-1, 2):
+            if 0 <= x + k < board_dimensions[0]:
+                for j in range(-1, 2):
+                    if 0 <= y + j < board_dimensions[1]:
+                        if main_board[x + k][y + j]["tile"]["text"] == "":
+                            uncover_tile(x + k, y + j)
+    else:
+        main_board[x][y]["tile"].config(text=str(main_board[x][y]["state"]))
 
 def main():
     title_label = tk.Label(main_window, text="Minesweeper", font=("Bauhaus 93", 30))
