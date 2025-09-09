@@ -111,6 +111,28 @@ def uncover_tile(x, y):
     else:
         main_board[x][y]["tile"].config(text=str(main_board[x][y]["state"]))
 
+
+def pick_color(value):
+    if value == 1:
+        return "lightblue"
+    elif value == 2:
+        return "green"
+    elif value == 3:
+        return "red"
+    elif value == 4:
+        return "blue"
+    elif value == 5:
+        return "darkred"
+    elif value == 6:
+        return "cyan"
+    elif value == 7:
+        return "black"
+    elif value == 8:
+        return "gray"
+    else:
+        return "black"
+
+
 def main():
     title_label = tk.Label(main_window, text="Minesweeper", font=("Bauhaus 93", 30))
     height_label = tk.Label(main_window, text="Height")
