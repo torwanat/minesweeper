@@ -109,28 +109,28 @@ def uncover_tile(x, y):
                         if main_board[x + k][y + j]["tile"]["text"] == "":
                             uncover_tile(x + k, y + j)
     else:
-        main_board[x][y]["tile"].config(text=str(main_board[x][y]["state"]))
+        main_board[x][y]["tile"].config(text=str(main_board[x][y]["state"]), fg=pick_color(main_board[x][y]["state"]))
 
 
 def pick_color(value):
     if value == 1:
-        return "lightblue"
+        return "#0000FF"
     elif value == 2:
-        return "green"
+        return "#008000"
     elif value == 3:
-        return "red"
+        return "#FF0000"
     elif value == 4:
-        return "blue"
+        return "#000080"
     elif value == 5:
-        return "darkred"
+        return "#800000"
     elif value == 6:
-        return "cyan"
+        return "#008080"
     elif value == 7:
-        return "black"
+        return "#808080"
     elif value == 8:
-        return "gray"
+        return "#800080"
     else:
-        return "black"
+        return "#000000"
 
 
 def main():
