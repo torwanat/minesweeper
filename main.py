@@ -3,7 +3,8 @@ import tkinter as tk
 
 global main_board
 global board_dimensions
-
+global game_window
+global status_label
 
 def validate_dimensions(height, width, mines):
     if not height.isdigit() or not width.isdigit() or not mines.isdigit():
@@ -15,29 +16,47 @@ def validate_dimensions(height, width, mines):
     return False
 
 
-def play_button_click(board_height, board_width, board_mines, status_label):
+def play_button_click(board_height, board_width, board_mines):
     if validate_dimensions(board_height, board_width, board_mines):
         start_game(int(board_height), int(board_width), int(board_mines))
     else:
-        status_label.config(text="Invalid dimensions!", fg="red")
+        update_status_label("Invalid dimensions!", "red")
         return
+
+
+def update_status_label(status_text, text_color):
+    global status_label
+    status_label.config(text=status_text, fg=text_color)
 
 
 def start_game(width, height, mines):
     global main_board
     global board_dimensions
-    board = tk.Toplevel(main_window)
-    board.title("Game of Minesweeper")
+    global game_window
+
+    update_status_label("Game ongoing...", "gray")
+
+    game_window = tk.Toplevel(main_window)
+    game_window.title("Game of Minesweeper")
 
     main_board = prepare_logical_board(width, height, mines)
-    tiles = prepare_tiles(width, height, board)
+    tiles = prepare_tiles(width, height, game_window)
     board_dimensions = [width, height]
 
     for x in range(len(main_board)):
         for y in range(len(main_board[x])):
             main_board[x][y]["tile"] = tiles[x][y]
 
-    board.mainloop()
+    game_window.mainloop()
+
+
+def end_game(result):
+    global game_window
+    game_window.destroy()
+    if result == "WIN":
+        update_status_label("Congratulations!", "green")
+    else:
+        update_status_label("Game over!", "red")
 
 
 def prepare_logical_board(width, height, mines):
@@ -45,7 +64,7 @@ def prepare_logical_board(width, height, mines):
     for i in range(width):
         tmp_board = []
         for j in range(height):
-            tmp_board.append({"state": 0, "tile": tk.Label()})
+            tmp_board.append({"state": 0, "tile": tk.Label(), "uncovered": False, "flagged": False})
         logical_board.append(tmp_board)
 
     mine_indexes = []
@@ -87,7 +106,10 @@ def prepare_tiles(width, height, board):
 
 
 def right_click_on_tile(event):
-    print(event.widget.grid_info())
+    x = event.widget.grid_info()["row"]
+    y = event.widget.grid_info()["column"]
+
+    toggle_flag(x, y)
 
 
 def left_click_on_tile(event):
@@ -98,10 +120,12 @@ def left_click_on_tile(event):
 
 
 def uncover_tile(x, y):
-    if main_board[x][y]["state"] == -1:
-        main_board[x][y]["tile"].config(bg="red")
-    elif main_board[x][y]["state"] == 0:
-        main_board[x][y]["tile"].config(bg="white", relief="flat", text="0", fg="white")
+    clicked_tile = main_board[x][y]
+    if clicked_tile["state"] == -1:
+        end_game("LOSE")
+    elif clicked_tile["state"] == 0 and not clicked_tile["flagged"]:
+        clicked_tile["tile"].config(bg="white", relief="flat", text="0", fg="white")
+        clicked_tile["uncovered"] = True
         for k in range(-1, 2):
             if 0 <= x + k < board_dimensions[0]:
                 for j in range(-1, 2):
@@ -109,8 +133,28 @@ def uncover_tile(x, y):
                         if main_board[x + k][y + j]["tile"]["text"] == "":
                             uncover_tile(x + k, y + j)
     else:
-        main_board[x][y]["tile"].config(text=str(main_board[x][y]["state"]), fg=pick_color(main_board[x][y]["state"]))
+        clicked_tile["tile"].config(text=str(clicked_tile["state"]), fg=pick_color(clicked_tile["state"]))
+        clicked_tile["uncovered"] = True
+        check_win()
 
+
+def check_win():
+    for row in main_board:
+        for tile in row:
+            if not tile["uncovered"] and tile["state"] != -1:
+                return
+
+    end_game("WIN")
+
+
+def toggle_flag(x, y):
+    clicked_tile = main_board[x][y]
+    if clicked_tile["flagged"]:
+        clicked_tile["tile"].config(text="")
+        clicked_tile["flagged"] = False
+    else:
+        clicked_tile["tile"].config(text="🚩")
+        clicked_tile["flagged"] = True
 
 def pick_color(value):
     if value == 1:
@@ -134,6 +178,8 @@ def pick_color(value):
 
 
 def main():
+    global status_label
+
     title_label = tk.Label(main_window, text="Minesweeper", font=("Bauhaus 93", 30))
     height_label = tk.Label(main_window, text="Height")
     width_label = tk.Label(main_window, text="Width")
@@ -144,7 +190,7 @@ def main():
     width_entry = tk.Entry(main_window)
     mines_entry = tk.Entry(main_window)
 
-    play_button = tk.Button(main_window, text="Play", command=lambda: play_button_click(height_entry.get(), width_entry.get(), mines_entry.get(), status_label))
+    play_button = tk.Button(main_window, text="Play", command=lambda: play_button_click(height_entry.get(), width_entry.get(), mines_entry.get()))
 
     title_label.grid(row=0, column=1, padx=20, pady=20)
     height_label.grid(row=1, column=1, padx=20)
