@@ -10,7 +10,7 @@ def validate_dimensions(height, width, mines):
     if not height.isdigit() or not width.isdigit() or not mines.isdigit():
         return False
 
-    if 0 < int(height) < 100 and 0 < int(width) < 100 and 0 < int(mines) < int(height) * int(width):
+    if 0 < int(height) <= 25 and 0 < int(width) <= 25 and 0 < int(mines) < int(height) * int(width):
         return True
 
     return False
