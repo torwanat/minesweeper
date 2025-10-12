@@ -6,6 +6,7 @@ global board_dimensions
 global game_window
 global main_menu_status
 global turn
+global result_text
 
 def validate_dimensions(height, width, mines):
     if not height.isdigit() or not width.isdigit() or not mines.isdigit():
@@ -32,9 +33,12 @@ def start_game(width, height, mines):
     global game_window
     global turn
     global main_menu_status
+    global result_text
 
     turn = tk.StringVar()
+    result_text = tk.StringVar()
     turn.set("Turn #1")
+    result_text.set("")
 
     main_menu_status.set("Game ongoing...")
 
@@ -45,7 +49,7 @@ def start_game(width, height, mines):
 
     top_frame = tk.Frame(game_window)
 
-    result_label = tk.Label(top_frame)
+    result_label = tk.Label(top_frame, textvariable=result_text)
     title_label = tk.Label(top_frame, text="Minesweeper", font=("Bauhaus 93", 12))
     turn_label = tk.Label(top_frame, textvariable=turn)
 
@@ -74,14 +78,15 @@ def increase_turn():
 
 
 def end_game(result):
-    global game_window
     global main_menu_status
+    global result_text
 
-    game_window.destroy()
     if result == "WIN":
         main_menu_status.set("Congratulations!")
+        result_text.set("You win!")
     else:
         main_menu_status.set("Game over!")
+        result_text.set("You lose :c")
 
 
 def prepare_logical_board(width, height, mines):
@@ -131,18 +136,24 @@ def prepare_tiles(width, height, board):
 
 
 def right_click_on_tile(event):
+    global main_menu_status
+
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
-    toggle_flag(x, y)
+    if main_menu_status == "Game ongoing...":
+        toggle_flag(x, y)
 
 
 def left_click_on_tile(event):
+    global main_menu_status
+
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
-    increase_turn()
-    uncover_tile(x, y)
+    if main_menu_status.get() == "Game ongoing...":
+        increase_turn()
+        uncover_tile(x, y)
 
 
 def uncover_tile(x, y):
