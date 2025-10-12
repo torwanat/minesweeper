@@ -1,5 +1,7 @@
+import csv
 import random
 import tkinter as tk
+import datetime
 
 global main_board
 global board_dimensions
@@ -7,6 +9,7 @@ global game_window
 global main_menu_status
 global turn
 global result_text
+global game_start_time
 
 def validate_dimensions(height, width, mines):
     if not height.isdigit() or not width.isdigit() or not mines.isdigit():
@@ -34,19 +37,18 @@ def start_game(width, height, mines):
     global turn
     global main_menu_status
     global result_text
+    global game_start_time
 
     turn = tk.StringVar()
     result_text = tk.StringVar()
     turn.set("Turn #1")
     result_text.set("")
-
     main_menu_status.set("Game ongoing...")
 
     game_window = tk.Toplevel(main_window)
     game_window.title("Game of Minesweeper")
 
     board_frame = tk.Frame(game_window)
-
     top_frame = tk.Frame(game_window)
 
     result_label = tk.Label(top_frame, textvariable=result_text)
@@ -68,25 +70,57 @@ def start_game(width, height, mines):
     top_frame.pack(side="top")
     board_frame.pack()
 
+    game_start_time = datetime.datetime.now()
+
     game_window.mainloop()
 
 
 def increase_turn():
     current_turn = turn.get()
-    next_turn = int(current_turn[-1]) + 1
+    next_turn = int(current_turn.split("#")[1]) + 1
     turn.set(f'Turn #{next_turn}')
 
 
 def end_game(result):
     global main_menu_status
     global result_text
+    global turn
+    global game_start_time
+
+    final_turn = int(turn.get().split("#")[1]) - 1
+    game_duration = get_game_duration(game_start_time, datetime.datetime.now())
 
     if result == "WIN":
         main_menu_status.set("Congratulations!")
         result_text.set("You win!")
+
+        write_stats_data([game_start_time.date(), game_duration, final_turn, "WIN", 0])
     else:
         main_menu_status.set("Game over!")
         result_text.set("You lose :c")
+
+        mines_left = get_mines_left()
+        write_stats_data([str(game_start_time.date()), game_duration, final_turn, "LOST", mines_left])
+
+
+def get_mines_left():
+    global main_menu_status
+    mines_counter = 0
+
+    for i in main_board:
+        for j in i:
+            if j["state"] == -1 and not j["flagged"]:
+                mines_counter += 1
+
+    return mines_counter
+
+
+def get_game_duration(game_start, game_end):
+    time_delta = game_end - game_start
+    full_seconds = time_delta.total_seconds()
+    minutes = int(full_seconds // 60)
+    seconds = int(full_seconds % 60)
+    return f"{minutes:02d}:{seconds:02d}"
 
 
 def prepare_logical_board(width, height, mines):
@@ -141,7 +175,7 @@ def right_click_on_tile(event):
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
-    if main_menu_status == "Game ongoing...":
+    if main_menu_status.get() == "Game ongoing...":
         toggle_flag(x, y)
 
 
@@ -193,6 +227,7 @@ def toggle_flag(x, y):
         clicked_tile["tile"].config(text="🚩")
         clicked_tile["flagged"] = True
 
+
 def pick_color(value):
     if value == 1:
         return "#0000FF"
@@ -215,34 +250,64 @@ def pick_color(value):
 
 
 def stats_button_click():
-    stats_data = []
+    stats_data = get_stats_data()
     show_stats(stats_data)
 
 
 def get_stats_data():
-    pass
+    try:
+        with open("stats.csv", "r") as stats_file:
+            stats_data = []
+            csv_stats_data = csv.reader(stats_file)
+
+            for line in csv_stats_data:
+                if line:
+                    stats_data.append(line)
+
+            return stats_data
+    except FileNotFoundError:
+        return []
 
 
 def show_stats(stats_data):
     stats_window = tk.Toplevel(main_window)
     stats_window.title("Statistics")
 
-    title_label = tk.Label(stats_window, text="Previous scores", font=("Arial", 15))
+    title_label = tk.Label(stats_window, text="Previous scores", font=("Bauhaus 93", 25))
     date_label = tk.Label(stats_window, text="Date")
     duration_label = tk.Label(stats_window, text="Duration")
     turns_label = tk.Label(stats_window, text="Turns")
     result_label = tk.Label(stats_window, text="Result")
     mines_left_label = tk.Label(stats_window, text="Mines left")
 
-    title_label.grid(row=0, column=2)
-    date_label.grid(row=1, column=0)
-    duration_label.grid(row=1, column=1)
-    turns_label.grid(row=1, column=2)
-    result_label.grid(row=1, column=3)
-    mines_left_label.grid(row=1, column=4)
+    title_label.grid(row=0, column=1, columnspan=3)
+    date_label.grid(row=1, column=0, padx=10)
+    duration_label.grid(row=1, column=1, padx=10)
+    turns_label.grid(row=1, column=2, padx=10)
+    result_label.grid(row=1, column=3, padx=10)
+    mines_left_label.grid(row=1, column=4, padx=10)
 
+    for i, row in enumerate(stats_data):
+        game_date_label = tk.Label(stats_window, text=row[0])
+        game_duration_label = tk.Label(stats_window, text=row[1])
+        game_turns_label = tk.Label(stats_window, text=row[2])
+        game_result_label = tk.Label(stats_window, text=row[3])
+        game_mines_left_label = tk.Label(stats_window, text=row[4])
+
+        game_date_label.grid(row=(i + 2), column=0)
+        game_duration_label.grid(row=(i + 2), column=1)
+        game_turns_label.grid(row=(i + 2), column=2)
+        game_result_label.grid(row=(i + 2), column=3)
+        game_mines_left_label.grid(row=(i + 2), column=4)
 
     stats_window.mainloop()
+
+
+def write_stats_data(data):
+    with open("stats.csv", "a+") as stats_file:
+        writer = csv.writer(stats_file)
+        writer.writerows([data])
+
 
 def main():
     global main_menu_status
