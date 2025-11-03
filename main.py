@@ -1,5 +1,6 @@
 import csv
 import random
+import sys
 import tkinter as tk
 import datetime
 
@@ -11,11 +12,13 @@ global turn
 global result_text
 global game_start_time
 
+sys.setrecursionlimit(2500)
+
 def validate_dimensions(height, width, mines):
     if not height.isdigit() or not width.isdigit() or not mines.isdigit():
         return False
 
-    if 0 < int(height) <= 25 and 0 < int(width) <= 25 and 0 < int(mines) < int(height) * int(width):
+    if 0 < int(height) <= 50 and 0 < int(width) <= 50 and 0 < int(mines) < int(height) * int(width):
         return True
 
     return False
@@ -131,15 +134,19 @@ def prepare_logical_board(width, height, mines):
             tmp_board.append({"state": 0, "tile": tk.Label(), "uncovered": False, "flagged": False})
         logical_board.append(tmp_board)
 
+    available_tiles = []
+    for x in range(width):
+        for y in range(height):
+            available_tiles.append((x, y))
+    random.shuffle(available_tiles)
+
     mine_indexes = []
     for i in range(mines):
-        while True:
-            x = random.randint(0, width - 1)
-            y = random.randint(0, height - 1)
-            if logical_board[x][y]["state"] == 0:
-                logical_board[x][y]["state"] = -1
-                mine_indexes.append([x, y])
-                break
+        x = available_tiles[i][0]
+        y = available_tiles[i][1]
+        logical_board[x][y]["state"] = -1
+        mine_indexes.append(available_tiles[i])
+
 
     for mine in mine_indexes:
         x = mine[0]
