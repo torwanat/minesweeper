@@ -3,6 +3,7 @@ import sys
 import tkinter as tk
 import datetime
 import stats
+import utils
 
 global main_board
 global board_dimensions
@@ -91,7 +92,7 @@ def end_game(result):
     global game_start_time
 
     final_turn = int(turn.get().split("#")[1]) - 1
-    game_duration = get_game_duration(game_start_time, datetime.datetime.now())
+    game_duration = utils.get_game_duration(game_start_time, datetime.datetime.now())
 
     if result == "WIN":
         main_menu_status.set("Congratulations!")
@@ -116,14 +117,6 @@ def get_mines_left():
                 mines_counter += 1
 
     return mines_counter
-
-
-def get_game_duration(game_start, game_end):
-    time_delta = game_end - game_start
-    full_seconds = time_delta.total_seconds()
-    minutes = int(full_seconds // 60)
-    seconds = int(full_seconds % 60)
-    return f"{minutes:02d}:{seconds:02d}"
 
 
 def prepare_logical_board(width, height, mines):
@@ -211,7 +204,7 @@ def uncover_tile(x, y):
                         if main_board[x + k][y + j]["tile"]["text"] == "":
                             uncover_tile(x + k, y + j)
     else:
-        clicked_tile["tile"].config(text=str(clicked_tile["state"]), fg=pick_color(clicked_tile["state"]))
+        clicked_tile["tile"].config(text=str(clicked_tile["state"]), fg=utils.pick_color(clicked_tile["state"]))
         clicked_tile["uncovered"] = True
         check_win()
 
@@ -233,27 +226,6 @@ def toggle_flag(x, y):
     else:
         clicked_tile["tile"].config(text="🚩")
         clicked_tile["flagged"] = True
-
-
-def pick_color(value):
-    if value == 1:
-        return "#0000FF"
-    elif value == 2:
-        return "#008000"
-    elif value == 3:
-        return "#FF0000"
-    elif value == 4:
-        return "#000080"
-    elif value == 5:
-        return "#800000"
-    elif value == 6:
-        return "#008080"
-    elif value == 7:
-        return "#808080"
-    elif value == 8:
-        return "#800080"
-    else:
-        return "#000000"
 
 
 def stats_button_click():
