@@ -172,6 +172,7 @@ def left_click_on_tile(event):
 def uncover_tile(x, y):
     clicked_tile = main_board[x][y]
     if clicked_tile["state"] == -1:
+        clicked_tile["tile"].config(bg="red")
         end_game("LOSE")
     elif clicked_tile["state"] == 0 and not clicked_tile["flagged"]:
         clicked_tile["tile"].config(bg="white", relief="flat", text="0", fg="white")
