@@ -46,7 +46,8 @@ def main():
 
     buttons_frame = tk.Frame(main_window)
 
-    play_button = tk.Button(buttons_frame, text="Play", command=lambda: play_button_click(height_entry.get(), width_entry.get(), mines_entry.get()))
+    play_button = tk.Button(buttons_frame, text="Play",
+                            command=lambda: play_button_click(height_entry.get(), width_entry.get(), mines_entry.get()))
     stats_button = tk.Button(buttons_frame, text="Stats", command=lambda: stats_button_click())
     gap_label = tk.Label(buttons_frame, width=10)
 

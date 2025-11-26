@@ -4,7 +4,7 @@ import tkinter as tk
 
 def get_stats_data():
     try:
-        with open("stats.csv", "r") as stats_file:
+        with open("stats.csv", "r", encoding="UTF-8") as stats_file:
             stats_data = []
             csv_stats_data = csv.reader(stats_file)
 
@@ -52,6 +52,9 @@ def show_stats(stats_data, main_window):
 
 
 def write_stats_data(data):
-    with open("stats.csv", "a+") as stats_file:
-        writer = csv.writer(stats_file)
-        writer.writerows([data])
+    try:
+        with open("stats.csv", "a+", encoding="UTF-8") as stats_file:
+            writer = csv.writer(stats_file)
+            writer.writerows([data])
+    except FileNotFoundError:
+        print("Stats file not found")
