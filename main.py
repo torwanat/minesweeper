@@ -1,11 +1,22 @@
+"""
+Main module of the program, manages the main menu window
+"""
 import sys
 import tkinter as tk
 import game
 import stats
 
+# For large boards
 sys.setrecursionlimit(2500)
 
 def validate_dimensions(height, width, mines):
+    """
+    Checks if the dimensions of the board are valid
+    :param height: height of the board (1 - 50)
+    :param width: width of the board (1 - 50)
+    :param mines: mines to place (1 - height * width - 1)
+    :return: True if the dimensions of the board are valid, False otherwise
+    """
     if not height.isdigit() or not width.isdigit() or not mines.isdigit():
         return False
 
@@ -16,19 +27,30 @@ def validate_dimensions(height, width, mines):
 
 
 def play_button_click(board_height, board_width, board_mines):
+    """
+    Handler for the play button click
+    :param board_height: inputted height of the board
+    :param board_width: inputted width of the board
+    :param board_mines: inputted amount of mines
+    """
     if validate_dimensions(board_height, board_width, board_mines):
         game.start_game(int(board_height), int(board_width), int(board_mines), main_window)
     else:
         main_menu_status.set("Invalid dimensions!")
-        return
 
 
 def stats_button_click():
+    """
+    Handler for the statistics button click
+    """
     stats_data = stats.get_stats_data()
     stats.show_stats(stats_data, main_window)
 
 
 def main():
+    """
+    Main function of the module, creates and manages the main menu window
+    """
     global main_menu_status
     main_menu_status = tk.StringVar()
 

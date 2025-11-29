@@ -1,4 +1,13 @@
+"""
+Module with helper functions and others
+"""
 def get_game_duration(game_start, game_end):
+    """
+    Calculates the game duration
+    :param game_start: start of the game (datetime.datetime)
+    :param game_end: end of the game (datetime.datetime)
+    :return: game duration as a formatted string
+    """
     time_delta = game_end - game_start
     full_seconds = time_delta.total_seconds()
     minutes = int(full_seconds // 60)
@@ -7,6 +16,11 @@ def get_game_duration(game_start, game_end):
 
 
 def pick_color(value):
+    """
+    Chooses the color of the text on the tile
+    :param value: value of the tile (int)
+    :return: color of the tile (str)
+    """
     if value == 1:
         return "#0000FF"
     elif value == 2:

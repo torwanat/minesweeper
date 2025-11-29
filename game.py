@@ -1,3 +1,6 @@
+"""
+Module for managing the game window
+"""
 import datetime
 import random
 import tkinter as tk
@@ -14,6 +17,13 @@ global turn
 global result_text
 
 def start_game(width, height, mines, main_window):
+    """
+    Starts the game, creates and manages the game window
+    :param width: width of the board
+    :param height: height of the board
+    :param mines: amount of mines
+    :param main_window: root window of the program
+    """
     global main_board
     global board_dimensions
     global turn
@@ -58,12 +68,19 @@ def start_game(width, height, mines, main_window):
 
 
 def increase_turn():
+    """
+    Increases the turn number
+    """
     current_turn = turn.get()
     next_turn = int(current_turn.split("#")[1]) + 1
     turn.set(f'Turn #{next_turn}')
 
 
 def end_game(result):
+    """
+    Ends the game
+    :param result: result of the game (WIN or LOSE)
+    """
     global game_status
     global result_text
 
@@ -71,13 +88,11 @@ def end_game(result):
     game_duration = utils.get_game_duration(game_start_time, datetime.datetime.now())
 
     if result == "WIN":
-        # main_menu_status.set("Congratulations!")
         game_status = "GAME_ENDED"
         result_text.set("You win!")
 
         stats.write_stats_data([game_start_time.date(), game_duration, final_turn, "WIN", 0])
     else:
-        # main_menu_status.set("Game over!")
         game_status = "GAME_ENDED"
         result_text.set("You lose :c")
 
@@ -86,6 +101,10 @@ def end_game(result):
 
 
 def get_mines_left():
+    """
+    Returns the number of mines left in the game
+    :return: number of mines left
+    """
     mines_counter = 0
 
     for i in main_board:
@@ -97,6 +116,13 @@ def get_mines_left():
 
 
 def prepare_logical_board(width, height, mines):
+    """
+    Prepares the logical board for the game
+    :param width: width of the board
+    :param height: height of the board
+    :param mines: amount of mines
+    :return: logical board of the game as a two-dimensional list of dictionaries
+    """
     logical_board = []
     for i in range(width):
         tmp_board = []
@@ -132,6 +158,13 @@ def prepare_logical_board(width, height, mines):
 
 
 def prepare_tiles(width, height, board):
+    """
+    Prepares the actual board for the game
+    :param width: width of the board
+    :param height: height of the board
+    :param board: logical board of the game (from the prepare_logical_board function)
+    :return: board of the game as a two-dimensional list of Labels in a grid
+    """
     tiles_array = []
     for i in range(width):
         tmp_array = []
@@ -147,6 +180,10 @@ def prepare_tiles(width, height, board):
 
 
 def right_click_on_tile(event):
+    """
+    Handles the right click on a tile
+    :param event: generic event parameter
+    """
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
@@ -155,6 +192,10 @@ def right_click_on_tile(event):
 
 
 def left_click_on_tile(event):
+    """
+    Handles the left click on a tile
+    :param event: generic event parameter
+    """
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
@@ -164,6 +205,11 @@ def left_click_on_tile(event):
 
 
 def uncover_tile(x, y):
+    """
+    Uncovers the clicked file and uses DFS to uncover adjacent tiles (if applicable)
+    :param x: x coordinate of the tile
+    :param y: y coordinate of the tile
+    """
     clicked_tile = main_board[x][y]
     if clicked_tile["state"] == -1:
         clicked_tile["tile"].config(bg="red")
@@ -184,6 +230,9 @@ def uncover_tile(x, y):
 
 
 def check_win():
+    """
+    Checks the win condition of the game
+    """
     for row in main_board:
         for tile in row:
             if not tile["uncovered"] and tile["state"] != -1:
@@ -193,6 +242,11 @@ def check_win():
 
 
 def toggle_flag(x, y):
+    """
+    Toggles the flag of the selected tile
+    :param x: x coordinate of the tile
+    :param y: y coordinate of the tile
+    """
     clicked_tile = main_board[x][y]
     if clicked_tile["flagged"]:
         clicked_tile["tile"].config(text="")

@@ -1,8 +1,15 @@
+"""
+Module for managing the stats window as well as writing / reading from a file
+"""
 import csv
 import tkinter as tk
 
 
 def get_stats_data():
+    """
+    Tries to read the stats data from the file
+    :return: stats data as a list
+    """
     try:
         with open("stats.csv", "r", encoding="UTF-8") as stats_file:
             stats_data = []
@@ -18,6 +25,11 @@ def get_stats_data():
 
 
 def show_stats(stats_data, main_window):
+    """
+    Creates and manages the stats window
+    :param stats_data: stats data as a list (from get_stats_data())
+    :param main_window: root window of the program
+    """
     stats_window = tk.Toplevel(main_window)
     stats_window.title("Statistics")
 
@@ -52,6 +64,10 @@ def show_stats(stats_data, main_window):
 
 
 def write_stats_data(data):
+    """
+    Tries to write the stats data to the file
+    :param data: data to be written to the file
+    """
     try:
         with open("stats.csv", "a+", encoding="UTF-8") as stats_file:
             writer = csv.writer(stats_file)
