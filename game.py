@@ -51,10 +51,12 @@ def start_game(width, height, mines, main_window):
     title_label.pack(side="left")
     turn_label.pack(side="left")
 
+    # Create the logical and actual boards and set the dimensions
     main_board = prepare_logical_board(width, height, mines)
     tiles = prepare_tiles(width, height, board_frame)
     board_dimensions = [width, height]
 
+    # Merge the logical and actual boards
     for x in range(len(main_board)):
         for y in range(len(main_board[x])):
             main_board[x][y]["tile"] = tiles[x][y]
@@ -123,6 +125,8 @@ def prepare_logical_board(width, height, mines):
     :param mines: amount of mines
     :return: logical board of the game as a two-dimensional list of dictionaries
     """
+
+    # Create starting board
     logical_board = []
     for i in range(width):
         tmp_board = []
@@ -130,12 +134,14 @@ def prepare_logical_board(width, height, mines):
             tmp_board.append({"state": 0, "tile": tk.Label(), "uncovered": False, "flagged": False})
         logical_board.append(tmp_board)
 
+    # Shuffle all possible coordinates
     available_tiles = []
     for x in range(width):
         for y in range(height):
             available_tiles.append((x, y))
     random.shuffle(available_tiles)
 
+    # Mark fields with mines
     mine_indexes = []
     for i in range(mines):
         x = available_tiles[i][0]
@@ -143,7 +149,7 @@ def prepare_logical_board(width, height, mines):
         logical_board[x][y]["state"] = -1
         mine_indexes.append(available_tiles[i])
 
-
+    # Add numbers to tiles bordering mines
     for mine in mine_indexes:
         x = mine[0]
         y = mine[1]
@@ -212,11 +218,15 @@ def uncover_tile(x, y):
     """
     clicked_tile = main_board[x][y]
     if clicked_tile["state"] == -1:
+        # Clicked on a mine, end game with a "LOSE" status
         clicked_tile["tile"].config(bg="red")
         end_game("LOSE")
     elif clicked_tile["state"] == 0 and not clicked_tile["flagged"]:
+        # Clicked on an empty tile, uncover and start DFS
         clicked_tile["tile"].config(bg="white", relief="flat", text="0", fg="white")
         clicked_tile["uncovered"] = True
+
+        # DFS for empty tiles to uncover
         for k in range(-1, 2):
             if 0 <= x + k < board_dimensions[0]:
                 for j in range(-1, 2):
@@ -224,6 +234,7 @@ def uncover_tile(x, y):
                         if main_board[x + k][y + j]["tile"]["text"] == "":
                             uncover_tile(x + k, y + j)
     else:
+        # Clicked on a border tile, uncover it
         clicked_tile["tile"].config(text=str(clicked_tile["state"]), fg=utils.pick_color(clicked_tile["state"]))
         clicked_tile["uncovered"] = True
         check_win()

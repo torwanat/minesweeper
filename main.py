@@ -34,6 +34,7 @@ def play_button_click(board_height, board_width, board_mines):
     :param board_mines: inputted amount of mines
     """
     if validate_dimensions(board_height, board_width, board_mines):
+        # Start the game window
         game.start_game(int(board_height), int(board_width), int(board_mines), main_window)
     else:
         main_menu_status.set("Invalid dimensions!")
@@ -43,7 +44,9 @@ def stats_button_click():
     """
     Handler for the statistics button click
     """
+    # Try to read stats data from the file
     stats_data = stats.get_stats_data()
+    # Start the stats window
     stats.show_stats(stats_data, main_window)
 
 
