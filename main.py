@@ -3,8 +3,6 @@ import tkinter as tk
 import game
 import stats
 
-global main_menu_status
-
 sys.setrecursionlimit(2500)
 
 def validate_dimensions(height, width, mines):
@@ -71,4 +69,5 @@ def main():
 if __name__ == '__main__':
     main_window = tk.Tk()
     main_window.title("Minesweeper")
+    main_menu_status = tk.StringVar()
     main()

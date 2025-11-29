@@ -5,6 +5,7 @@ def get_game_duration(game_start, game_end):
     seconds = int(full_seconds % 60)
     return f"{minutes:02d}:{seconds:02d}"
 
+
 def pick_color(value):
     if value == 1:
         return "#0000FF"

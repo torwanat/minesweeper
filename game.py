@@ -4,18 +4,18 @@ import tkinter as tk
 import utils
 import stats
 
-global main_board
-global board_dimensions
-global game_window
+main_board = []
+board_dimensions = []
+game_start_time = datetime.datetime.now()
+game_status = ""
+
+# Otherwise linter gets mad
 global turn
 global result_text
-global game_start_time
-global game_status
 
 def start_game(width, height, mines, main_window):
     global main_board
     global board_dimensions
-    global game_window
     global turn
     global result_text
     global game_start_time
@@ -66,8 +66,6 @@ def increase_turn():
 def end_game(result):
     global game_status
     global result_text
-    global turn
-    global game_start_time
 
     final_turn = int(turn.get().split("#")[1]) - 1
     game_duration = utils.get_game_duration(game_start_time, datetime.datetime.now())
@@ -149,8 +147,6 @@ def prepare_tiles(width, height, board):
 
 
 def right_click_on_tile(event):
-    global game_status
-
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
@@ -159,12 +155,10 @@ def right_click_on_tile(event):
 
 
 def left_click_on_tile(event):
-    global game_status
-
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
-    if game_status == "GAME_ONGOING":
+    if game_status == "GAME_ONGOING" and not main_board[x][y]["uncovered"]:
         increase_turn()
         uncover_tile(x, y)
 
