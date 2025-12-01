@@ -100,6 +100,8 @@ def end_game(won):
         game_status = "GAME_ENDED"
         result_text.set("You lose :c")
 
+        show_mines()
+
         mines_left = get_mines_left()
         stats.write_stats_data([str(game_start_time.date()), game_duration, final_turn, "LOST", mines_left])
 
@@ -111,13 +113,19 @@ def get_mines_left():
     """
     mines_counter = 0
 
-    for i in main_board:
-        for j in i:
-            if j["state"] == -1 and not j["flagged"]:
+    for row in main_board:
+        for tile in row:
+            if tile["state"] == -1 and not tile["flagged"]:
                 mines_counter += 1
 
     return mines_counter
 
+
+def show_mines():
+    for row in main_board:
+        for tile in row:
+            if tile["state"] == -1:
+                tile["tile"].config(bg="red")
 
 def prepare_logical_board(width, height, mines):
     """
