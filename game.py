@@ -216,6 +216,7 @@ def left_click_on_tile(event):
     if game_status == "GAME_ONGOING" and not main_board[x][y]["uncovered"]:
         increase_turn()
         uncover_tile(x, y)
+        check_win()
 
 
 def uncover_tile(x, y):
@@ -245,7 +246,6 @@ def uncover_tile(x, y):
         # Clicked on a border tile, uncover it
         clicked_tile["tile"].config(text=str(clicked_tile["state"]), fg=utils.pick_color(clicked_tile["state"]))
         clicked_tile["uncovered"] = True
-        check_win()
 
 
 def check_win():
