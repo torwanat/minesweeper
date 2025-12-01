@@ -24,21 +24,21 @@ def get_stats_data():
         return []
 
 
-def show_stats(stats_data, main_window):
+def on_frame_configure(canvas):
     """
-    Creates and manages the stats window
-    :param stats_data: stats data as a list (from get_stats_data())
-    :param main_window: root window of the program
+    Reset the scroll region to encompass the inner frame
+    :param canvas: tkinter Canvas object
     """
-    stats_window = tk.Toplevel(main_window)
-    stats_window.title("Statistics")
+    canvas.configure(scrollregion=canvas.bbox("all"))
 
-    title_label = tk.Label(stats_window, text="Previous scores", font=("Bauhaus 93", 25))
-    date_label = tk.Label(stats_window, text="Date")
-    duration_label = tk.Label(stats_window, text="Duration")
-    turns_label = tk.Label(stats_window, text="Turns")
-    result_label = tk.Label(stats_window, text="Result")
-    mines_left_label = tk.Label(stats_window, text="Mines left")
+
+def fill_stats_frame(stats_frame, stats_data):
+    title_label = tk.Label(stats_frame, text="Previous scores", font=("Bauhaus 93", 25))
+    date_label = tk.Label(stats_frame, text="Date")
+    duration_label = tk.Label(stats_frame, text="Duration")
+    turns_label = tk.Label(stats_frame, text="Turns")
+    result_label = tk.Label(stats_frame, text="Result")
+    mines_left_label = tk.Label(stats_frame, text="Mines left")
 
     title_label.grid(row=0, column=1, columnspan=3)
     date_label.grid(row=1, column=0, padx=10)
@@ -48,17 +48,40 @@ def show_stats(stats_data, main_window):
     mines_left_label.grid(row=1, column=4, padx=10)
 
     for i, row in enumerate(stats_data):
-        game_date_label = tk.Label(stats_window, text=row[0])
-        game_duration_label = tk.Label(stats_window, text=row[1])
-        game_turns_label = tk.Label(stats_window, text=row[2])
-        game_result_label = tk.Label(stats_window, text=row[3])
-        game_mines_left_label = tk.Label(stats_window, text=row[4])
+        game_date_label = tk.Label(stats_frame, text=row[0])
+        game_duration_label = tk.Label(stats_frame, text=row[1])
+        game_turns_label = tk.Label(stats_frame, text=row[2])
+        game_result_label = tk.Label(stats_frame, text=row[3])
+        game_mines_left_label = tk.Label(stats_frame, text=row[4])
 
         game_date_label.grid(row=(i + 2), column=0)
         game_duration_label.grid(row=(i + 2), column=1)
         game_turns_label.grid(row=(i + 2), column=2)
         game_result_label.grid(row=(i + 2), column=3)
         game_mines_left_label.grid(row=(i + 2), column=4)
+
+
+def show_stats(stats_data, main_window):
+    """
+    Creates and manages the stats window
+    :param stats_data: stats data as a list (from get_stats_data())
+    :param main_window: root window of the program
+    """
+    stats_window = tk.Toplevel(main_window)
+    stats_window.title("Statistics")
+
+    stats_canvas = tk.Canvas(stats_window, borderwidth=0)
+    stats_canvas_frame = tk.Frame(stats_canvas)
+    vsb = tk.Scrollbar(stats_window, orient="vertical", command=stats_canvas.yview)
+    stats_canvas.configure(yscrollcommand=vsb.set)
+
+    vsb.pack(side="right", fill="y")
+    stats_canvas.pack(side="left", fill="both", expand=True)
+    stats_canvas.create_window((4, 4), window=stats_canvas_frame, anchor="nw")
+
+    stats_canvas_frame.bind("<Configure>", lambda event, canvas=stats_canvas: on_frame_configure(stats_canvas))
+
+    fill_stats_frame(stats_canvas_frame, stats_data)
 
     stats_window.mainloop()
 
