@@ -10,7 +10,7 @@ import stats
 main_board = []
 board_dimensions = []
 game_start_time = datetime.datetime.now()
-game_status = ""
+game_status = "WINDOW_CLOSED"
 
 # Otherwise linter gets mad
 global turn
@@ -68,6 +68,7 @@ def start_game(width, height, mines, main_window):
 
     game_start_time = datetime.datetime.now()
 
+    game_window.protocol("WM_DELETE_WINDOW", on_closing)
     game_window.mainloop()
 
 
@@ -204,10 +205,13 @@ def left_click_on_tile(event):
     Handles the left click on a tile
     :param event: generic event parameter
     """
+    global game_status
+
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
     if game_status == "GAME_ENDED":
+        game_status = "WINDOW_CLOSED"
         game_window.destroy()
 
     if game_status == "GAME_ONGOING" and not main_board[x][y]["uncovered"]:
@@ -270,3 +274,10 @@ def toggle_flag(x, y):
     else:
         clicked_tile["tile"].config(text="🚩")
         clicked_tile["flagged"] = True
+
+
+def on_closing():
+    global game_status
+
+    game_status = "WINDOW_CLOSED"
+    game_window.destroy()

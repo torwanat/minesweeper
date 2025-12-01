@@ -44,9 +44,11 @@ def play_button_click(board_height, board_width, board_mines):
     """
     if validate_dimensions(board_height, board_width, board_mines):
         main_menu_status.set("")
-        # Start the game window
-        game.start_game(int(board_height), int(board_width), int(board_mines), main_window)
-
+        if game.game_status == "WINDOW_CLOSED":
+            # Start the game window
+            game.start_game(int(board_height), int(board_width), int(board_mines), main_window)
+        else:
+            main_menu_status.set("Game is already ongoing!")
 
 def stats_button_click():
     """

@@ -77,7 +77,7 @@ def show_stats(stats_data, main_window):
 
     vsb.pack(side="right", fill="y")
     stats_canvas.pack(side="left", fill="both", expand=True)
-    stats_canvas.create_window((4, 4), window=stats_canvas_frame, anchor="nw")
+    stats_canvas.create_window((15, 0), window=stats_canvas_frame, anchor="nw")
 
     stats_canvas_frame.bind("<Configure>", lambda event, canvas=stats_canvas: on_frame_configure(stats_canvas))
 
