@@ -4,6 +4,7 @@ Module for managing the stats window as well as writing / reading from a file
 import csv
 import tkinter as tk
 
+stats_window_opened = False
 
 def get_stats_data():
     """
@@ -33,6 +34,12 @@ def on_frame_configure(canvas):
 
 
 def fill_stats_frame(stats_frame, stats_data):
+    """
+    Fills the stats frame with data from file
+    :param stats_frame: frame to fill with data
+    :param stats_data: stats data to fill the frame with
+    :return:
+    """
     title_label = tk.Label(stats_frame, text="Previous scores", font=("Bauhaus 93", 25))
     date_label = tk.Label(stats_frame, text="Date")
     duration_label = tk.Label(stats_frame, text="Duration")
@@ -67,6 +74,8 @@ def show_stats(stats_data, main_window):
     :param stats_data: stats data as a list (from get_stats_data())
     :param main_window: root window of the program
     """
+    global stats_window_opened
+
     stats_window = tk.Toplevel(main_window)
     stats_window.title("Statistics")
 
@@ -83,6 +92,9 @@ def show_stats(stats_data, main_window):
 
     fill_stats_frame(stats_canvas_frame, stats_data)
 
+    stats_window_opened = True
+
+    stats_window.protocol("WM_DELETE_WINDOW", lambda: on_closing(stats_window))
     stats_window.mainloop()
 
 
@@ -97,3 +109,14 @@ def write_stats_data(data):
             writer.writerows([data])
     except FileNotFoundError:
         print("Stats file not found")
+
+
+def on_closing(stats_window):
+    """
+    Protocol handler for window closing
+    :param stats_window: window to close
+    """
+    global stats_window_opened
+
+    stats_window_opened = False
+    stats_window.destroy()

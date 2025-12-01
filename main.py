@@ -54,10 +54,14 @@ def stats_button_click():
     """
     Handler for the statistics button click
     """
-    # Try to read stats data from the file
-    stats_data = stats.get_stats_data()
-    # Start the stats window
-    stats.show_stats(stats_data, main_window)
+    if not stats.stats_window_opened:
+        main_menu_status.set("")
+        # Try to read stats data from the file
+        stats_data = stats.get_stats_data()
+        # Start the stats window
+        stats.show_stats(stats_data, main_window)
+    else:
+        main_menu_status.set("Stats window already opened!")
 
 
 def quit_button_click():

@@ -277,6 +277,9 @@ def toggle_flag(x, y):
 
 
 def on_closing():
+    """
+    Protocol handler for closing the window
+    """
     global game_status
 
     game_status = "WINDOW_CLOSED"
