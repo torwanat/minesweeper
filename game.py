@@ -15,6 +15,7 @@ game_status = ""
 # Otherwise linter gets mad
 global turn
 global result_text
+global game_window
 
 def start_game(width, height, mines, main_window):
     """
@@ -30,6 +31,7 @@ def start_game(width, height, mines, main_window):
     global result_text
     global game_start_time
     global game_status
+    global game_window
 
     turn = tk.StringVar()
     result_text = tk.StringVar()
@@ -204,6 +206,9 @@ def left_click_on_tile(event):
     """
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
+
+    if game_status == "GAME_ENDED":
+        game_window.destroy()
 
     if game_status == "GAME_ONGOING" and not main_board[x][y]["uncovered"]:
         increase_turn()
