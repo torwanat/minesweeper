@@ -81,21 +81,21 @@ def increase_turn():
     turn.set(f'Turn #{next_turn}')
 
 
-def end_game(result):
+def end_game(won):
     """
     Ends the game
-    :param result: result of the game (WIN or LOSE)
+    :param won: result of the game (bool)
     """
     global game_status
 
     final_turn = int(turn.get().split("#")[1]) - 1
     game_duration = utils.get_game_duration(game_start_time, datetime.datetime.now())
 
-    if result == "WIN":
+    if won:
         game_status = "GAME_ENDED"
         result_text.set("You win!")
 
-        stats.write_stats_data([game_start_time.date(), game_duration, final_turn, "WIN", 0])
+        stats.write_stats_data([game_start_time.date(), game_duration, final_turn, "WON", 0])
     else:
         game_status = "GAME_ENDED"
         result_text.set("You lose :c")
@@ -121,7 +121,12 @@ def get_mines_left():
 
 def prepare_logical_board(width, height, mines):
     """
-    Prepares the logical board for the game
+    Prepares the logical board for the game (2D list of dictionaries with keys:
+    state: int,
+    tile: Label
+    uncovered: bool
+    flagged: bool
+    )
     :param width: width of the board
     :param height: height of the board
     :param mines: amount of mines
@@ -167,7 +172,7 @@ def prepare_logical_board(width, height, mines):
 
 def prepare_tiles(width, height, board):
     """
-    Prepares the actual board for the game
+    Prepares the actual board (2D list of Labels with callbacks) for the game
     :param width: width of the board
     :param height: height of the board
     :param board: logical board of the game (from the prepare_logical_board function)
@@ -209,10 +214,12 @@ def left_click_on_tile(event):
     x = event.widget.grid_info()["row"]
     y = event.widget.grid_info()["column"]
 
+    # Close the window after the end of the game
     if game_status == "GAME_ENDED":
         game_status = "WINDOW_CLOSED"
         game_window.destroy()
 
+    # Proceed if game is ongoing and tile is not already uncovered
     if game_status == "GAME_ONGOING" and not main_board[x][y]["uncovered"]:
         increase_turn()
         uncover_tile(x, y)
@@ -227,9 +234,9 @@ def uncover_tile(x, y):
     """
     clicked_tile = main_board[x][y]
     if clicked_tile["state"] == -1:
-        # Clicked on a mine, end game with a "LOSE" status
+        # Clicked on a mine, game lost
         clicked_tile["tile"].config(bg="red")
-        end_game("LOSE")
+        end_game(False)
     elif clicked_tile["state"] == 0 and not clicked_tile["flagged"]:
         # Clicked on an empty tile, uncover and start DFS
         clicked_tile["tile"].config(bg="white", relief="flat", text="0", fg="white")
@@ -257,7 +264,7 @@ def check_win():
             if not tile["uncovered"] and tile["state"] != -1:
                 return
 
-    end_game("WIN")
+    end_game(True) # Game won
 
 
 def toggle_flag(x, y):

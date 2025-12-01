@@ -9,6 +9,9 @@ import stats
 # For large boards
 sys.setrecursionlimit(2500)
 
+# Otherwise linter gets mad
+global main_menu_status
+
 def validate_dimensions(height, width, mines):
     """
     Checks if the dimensions of the board are valid
@@ -118,5 +121,4 @@ def main():
 if __name__ == '__main__':
     main_window = tk.Tk()
     main_window.title("Minesweeper")
-    main_menu_status = tk.StringVar()
     main()
