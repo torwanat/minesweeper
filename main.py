@@ -20,13 +20,13 @@ def validate_dimensions(height, width, mines):
     message = ""
 
     if not height.isdigit() or not 0 < int(height) <= 50:
-        message += "Height must be between 1 and 50\n"
+        message += "Height must be between 1 and 50!\n"
 
     if not width.isdigit() or not 0 < int(width) <= 50:
-        message += "Width must be between 1 and 50\n"
+        message += "Width must be between 1 and 50!\n"
 
     if not mines.isdigit() or not 0 < int(mines) < int(height) * int(width):
-        message += "Mines must fit on the board and be greater than 0\n"
+        message += "Mines must fit on the board and be greater than 0!\n"
 
     if message:
         main_menu_status.set(message)
@@ -43,6 +43,7 @@ def play_button_click(board_height, board_width, board_mines):
     :param board_mines: inputted amount of mines
     """
     if validate_dimensions(board_height, board_width, board_mines):
+        main_menu_status.set("")
         # Start the game window
         game.start_game(int(board_height), int(board_width), int(board_mines), main_window)
 
@@ -56,6 +57,9 @@ def stats_button_click():
     # Start the stats window
     stats.show_stats(stats_data, main_window)
 
+
+def quit_button_click():
+    main_window.destroy()
 
 def main():
     """
@@ -78,12 +82,16 @@ def main():
 
     play_button = tk.Button(buttons_frame, text="Play",
                             command=lambda: play_button_click(height_entry.get(), width_entry.get(), mines_entry.get()))
-    stats_button = tk.Button(buttons_frame, text="Stats", command=lambda: stats_button_click())
-    gap_label = tk.Label(buttons_frame, width=10)
+    quit_button = tk.Button(buttons_frame, text="Quit", command=quit_button_click)
+    stats_button = tk.Button(buttons_frame, text="Stats", command=stats_button_click)
+    left_gap_label = tk.Label(buttons_frame, width=5)
+    right_gap_label = tk.Label(buttons_frame, width=5)
 
     play_button.pack(side="left")
-    gap_label.pack(side="left")
+    left_gap_label.pack(side="left")
     stats_button.pack(side="left")
+    right_gap_label.pack(side="left")
+    quit_button.pack(side="left")
 
     title_label.grid(row=0, column=1, padx=20, pady=20)
     height_label.grid(row=1, column=1, padx=20)
