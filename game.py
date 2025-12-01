@@ -122,6 +122,9 @@ def get_mines_left():
 
 
 def show_mines():
+    """
+    Highlights all the mines on the board
+    """
     for row in main_board:
         for tile in row:
             if tile["state"] == -1:
