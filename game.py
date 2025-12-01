@@ -87,7 +87,6 @@ def end_game(result):
     :param result: result of the game (WIN or LOSE)
     """
     global game_status
-    global result_text
 
     final_turn = int(turn.get().split("#")[1]) - 1
     game_duration = utils.get_game_duration(game_start_time, datetime.datetime.now())

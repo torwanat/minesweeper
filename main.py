@@ -65,6 +65,9 @@ def stats_button_click():
 
 
 def quit_button_click():
+    """
+    Close the main window
+    """
     main_window.destroy()
 
 def main():
