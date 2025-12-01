@@ -104,7 +104,7 @@ def write_stats_data(data):
     :param data: data to be written to the file
     """
     try:
-        with open("stats.csv", "a+", encoding="UTF-8") as stats_file:
+        with open("stats.csv", "a+", encoding="UTF-8", newline="") as stats_file:
             writer = csv.writer(stats_file)
             writer.writerows([data])
     except FileNotFoundError:
