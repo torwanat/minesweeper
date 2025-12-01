@@ -25,7 +25,7 @@ def validate_dimensions(height, width, mines):
     if not width.isdigit() or not 0 < int(width) <= 50:
         message += "Width must be between 1 and 50!\n"
 
-    if not mines.isdigit() or not 0 < int(mines) < int(height) * int(width):
+    if not mines.isdigit() or (not message and not 0 < int(mines) < int(height) * int(width)):
         message += "Mines must fit on the board and be greater than 0!\n"
 
     if message:
