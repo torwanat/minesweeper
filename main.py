@@ -17,13 +17,22 @@ def validate_dimensions(height, width, mines):
     :param mines: mines to place (1 - height * width - 1)
     :return: True if the dimensions of the board are valid, False otherwise
     """
-    if not height.isdigit() or not width.isdigit() or not mines.isdigit():
+    message = ""
+
+    if not height.isdigit() or not 0 < int(height) <= 50:
+        message += "Height must be between 1 and 50\n"
+
+    if not width.isdigit() or not 0 < int(width) <= 50:
+        message += "Width must be between 1 and 50\n"
+
+    if not mines.isdigit() or not 0 < int(mines) < int(height) * int(width):
+        message += "Mines must fit on the board and be greater than 0\n"
+
+    if message:
+        main_menu_status.set(message)
         return False
 
-    if 0 < int(height) <= 50 and 0 < int(width) <= 50 and 0 < int(mines) < int(height) * int(width):
-        return True
-
-    return False
+    return True
 
 
 def play_button_click(board_height, board_width, board_mines):
@@ -36,8 +45,6 @@ def play_button_click(board_height, board_width, board_mines):
     if validate_dimensions(board_height, board_width, board_mines):
         # Start the game window
         game.start_game(int(board_height), int(board_width), int(board_mines), main_window)
-    else:
-        main_menu_status.set("Invalid dimensions!")
 
 
 def stats_button_click():
